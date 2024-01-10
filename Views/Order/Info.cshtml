@@ -1,0 +1,35 @@
+﻿@model agency.Models.Order
+@{
+    int pr = 0;
+    int prPerson = 0;
+}
+@foreach (var i in Model.OrderedTours)
+{
+    <div class="card mt-3" style="width:300px">
+        <div style ="margin-top: 30px; margin-left: 30px">
+            <h4>@i.Tour.TourName</h4>
+            <p>Количесво человек @i.PersonsCount</p>
+            @if(i.Tour.HotTour)
+            {
+                pr = (int)(i.Tour.Price * 0.8);
+                <p>Цена за 1: @pr</p>
+            } else
+            {
+                <p>@i.Tour.Price₽</p>
+            }
+            @if (i.Tour.HotTour)
+            {
+                prPerson = (int)(i.Tour.Price * 0.8) * i.PersonsCount;
+                <h4>Итого: @prPerson</h4>
+            } else
+            {
+                prPerson = i.Tour.Price * i.PersonsCount;
+                <h4>Итого: @prPerson</h4>
+            }
+        </div>
+    </div>
+    
+}
+
+<h2>Итоговая цена - @Model.Price</h2>
+<a asp-action="">Назад</a>

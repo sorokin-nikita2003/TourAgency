@@ -1,0 +1,48 @@
+﻿.navbar{
+  background-color:wheat;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 124px;
+}
+.btn-back{
+  height: 50px;
+  width: 50px;
+  border-radius: 15px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  margin-left: 5px;
+}
+.fa-xl{
+  color: #37D68A;
+}
+.btn-back:hover{
+  .fa-xl{
+    color: #3761F6;
+  }
+}
+a{
+  text-decoration: none;
+}
+footer {
+    height: 65px;
+    background-color: wheat;
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    color: #FFFFFF;
+}
+.privacy{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: inherit;
+  font-size: 18px;
+  font-family: 'Nunito', sans-serif;
+}

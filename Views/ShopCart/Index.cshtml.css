@@ -1,0 +1,83 @@
+.tour-card{
+    width: 770px;
+    min-height: 205px;
+    border-radius: 25px;
+    border: 1px solid #000;
+    background: #FFF;
+    min-width: 650px;
+  }
+  .card-body{
+    min-height: inherit;
+  }
+  .persons-count{
+
+  }
+  .card-text{
+    min-height: 0px;
+  }
+  .card-btn, .p-counter{
+    border: 1px solid #000;
+    background: #FFF;
+    height: 36px;
+    width: 38px;
+  }
+  .card-btn-plus{
+    border-radius: 0px 20px 20px 0px;
+    padding-left: 10px;
+  }
+  .card-btn:hover{
+    background: #3761F6;
+    color: #FFF;
+  }
+  .card-btn-minus{
+    border-radius: 20px 0px 0px 20px;
+    padding-right: 10px;
+  }
+  .card-btn-minus.disabled{
+    background: #bababa;
+    color: black;
+  }
+  .p-counter{
+    border-left: none;
+    border-right: none;
+    font-style: normal;
+    min-width: 40px;
+    align-items: center;
+    justify-content: center;
+  }
+  .btn-trash{
+    background-image: url(img/trash.svg);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: .33s all;
+  }
+  .btn-trash:focus{
+    /* box-shadow: none; */
+  }
+  .btn-trash:hover{
+    background-image: url(img/trash-hover.svg);
+  }
+  .empty-cart{
+    border-radius: 80px;
+    border: 10px solid #37D68A;
+    width: inherit;
+    height: 60vh;
+    background-color: transparent;
+  }
+  .empty-cart-border{
+    box-sizing: border-box;
+    border-radius: 72px;
+    border: 1px solid #000;
+    background: rgba(93, 208, 216, 0.26);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .empty-cart-border h2{
+    display: flex;
+    font-size: 48px;
+  }

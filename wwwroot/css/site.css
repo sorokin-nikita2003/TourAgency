@@ -1,0 +1,140 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+  font-family: 'Nunito', sans-serif;
+}
+
+a{
+  text-decoration: none;
+}
+
+.navbar-brand{
+  color: #FFF;
+  text-align: center;
+  font-family: Kaushan Script;
+  font-size: 44px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 12px;
+}
+.navbar-brand:hover{
+  color: #3761F6;
+}
+.card-text-container{
+  display: flex;
+  /* align-items: end; */
+  justify-content: space-between;
+}
+.card-text{
+  color: #000;
+  font-size: 24px;
+  font-style: italic;
+  font-weight: 600;
+  line-height: normal;
+  margin-right: 15px;
+  min-height: 100px;
+  display: flex;
+  align-items: flex-end;
+}
+.price{
+  color: #000;
+  text-align: center;
+  font-size: 36px;
+  font-style: italic;
+  font-weight: 600;
+  line-height: normal;
+  display: flex;
+  justify-content: flex-end;
+}
+.card-title{
+  color: #000;
+  text-align: center;
+  font-size: 44px;
+  font-style: italic;
+  font-weight: 600;
+  line-height: normal;
+  justify-content: flex-start;
+  display: flex;
+  text-wrap: nowrap;
+}
+.buy-btn{
+  border-radius: 20px;
+  background-color: #3761F6;
+  width: 250px;
+  height: 45px;
+  flex-shrink: 0;
+  color: #FFF;
+  text-align: center;
+  font-size: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-price-container{
+  display: flex;
+  align-items: end;
+  justify-content: flex-end;
+}
+.card {
+    align-items: center;
+    min-height: 205px;
+    border: 3px solid #000;
+    background: #FFF;
+}
+.card-body{
+  padding: 20px !important;
+}
+#rectangle {
+  width: 80%;
+  height: 0px;
+  border-bottom: solid 1px #000;
+  background: #000;
+  /* border-radius: 15px; */
+  align-self: center;
+}
+.tags{
+  min-width: 220px;
+  max-width: 300px;
+  min-height: calc(452px - 16px);
+  border-radius: 25px;
+  border: 1px solid #000;
+  background: #FFF;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.tag_title{
+  color: #000;
+  text-align: center;
+  font-family: Nunito;
+  font-size: 20px;
+  font-style: italic;
+  font-weight: 600;
+  line-height: normal;
+  width: 160px;
+  align-self: center;
+}
+.list-group-item{
+  display: flex;
+  flex-direction: row-reverse;
+  border: none;
+}
+.btn:focus{
+  box-shadow: none !important;
+}

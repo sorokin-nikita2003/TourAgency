@@ -1,0 +1,20 @@
+﻿@model IEnumerable<TourAgency.Models.Tour>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1 class="text-center">Туры @ViewBag.UserId</h1>
+
+<p>
+    @if (User.IsInRole("TourOperator"))
+    {
+        <a class="h3" asp-action="Create">Добавить тур</a>
+    }
+</p>
+<div class="row justify-content-center">
+    <div style="padding:7px; width:500px" name="view" id="view">
+        @await Html.PartialAsync("Search", Model)
+    </div>
+    
+</div>

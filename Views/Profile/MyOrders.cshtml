@@ -1,0 +1,39 @@
+﻿@model List<agency.Models.Order>
+
+
+<div>
+    <hr />
+    <div class="row justify-content-center">
+        
+        <div class="col-md-4">
+            @foreach (var item in Model)
+            {
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="text-body">Номер заказа @item.Id</div>
+                        <div class="text-body">Статус заказа @item.OrderStatus</div>
+                        @if (item.OrderStatus != "Отменён" && item.PaymentStatus != null)
+                        {
+                            <div class="text-body">Статус оплаты @item.PaymentStatus</div>
+                        }
+                        <div class="text-body">Цена заказа @item.Price</div>
+                        <a asp-action="Info" asp-controller="Order" asp-route-id=@item.Id>Содержимое заказа</a>
+                        @if (item.OrderStatus != "Отменён" && item.PaymentStatus == "Ожидает оплаты")
+                        {
+                            <a asp-action="Cencel" asp-route-id=@item.Id>Отменить</a>
+                        }
+                        @if (item.OrderStatus != "Отменён" && item.PaymentStatus == "Ожидает оплаты")
+                        {
+                            <a asp-action="Payment" asp-controller="Order" asp-route-id=@item.Id>Оплатить</a>
+                        }
+                    </div>
+                </div>
+            }
+
+            @if(Model == null || Model.Count() == 0)
+            {
+                <h2>У вас пока нет заказов</h2>
+            }
+        </div>
+    </div>
+</div>

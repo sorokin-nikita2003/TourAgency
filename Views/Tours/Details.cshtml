@@ -1,0 +1,61 @@
+﻿@model TourAgency.Models.Tour
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Подробное описание тура</h1>
+
+<div>
+    <h4>
+    <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TourName)
+    </dd></h4>
+    <hr />
+    <dl class="row justify-content-center">
+        
+        <dt class = "col-sm-2">
+           Страна
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Country)
+        </dd>
+        <dt class = "col-sm-2">
+            Стоимость
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Price)
+        </dd>
+        <dt class = "col-sm-2">
+           Начало тура
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.DateStart)
+        </dd>
+        <dt class = "col-sm-2">
+            Описание тура
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+       
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.HotTour)
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.HotTour == true)
+            {
+                <p>Да</p>
+            }
+            else
+            {
+                <p>Нет</p>
+            }
+        </dd>
+
+    </dl>
+</div>
+<div>
+    <a style="margin-right:10px" asp-action="Edit" asp-route-id="@Model?.Id">Редактировать</a>
+    <a asp-action="Index">Назад</a>
+</div>

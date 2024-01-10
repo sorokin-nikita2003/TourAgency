@@ -1,0 +1,82 @@
+﻿@model TourAgency.Models.ViewModel.ShopCart
+ @* <h1>Здравствуйте @User.Identity.Name</h1> *@
+
+@if(Model.tours.Count() > 0)
+{
+    @for(int i = 0; i < Model.tours.Count(); i++)
+    {
+        <div class="card">
+            <div class="card-body row h-100 w-100 mx-0">
+                <div class="col-8 d-flex flex-column justify-content-between">
+                    <h5 style="font-style:bold; font-family:'Times New Roman', Times, serif">@Model.tours[i].TourName</h5>
+                    <div>
+                        <p>Количество человек</p>
+                        <div class="personsCount d-flex flex-row-reverse w-100 justify-content-end">
+                            <form class="m-0" asp-action="PlusPerson" asp-route-id="@Model.basket[i].Id" style="margin-right: 10px;">
+                                <input type="submit" value="+" class="btn-primary" />
+                            </form>
+                            <p style="margin:0 5px">@Model.basket[i].PersonsCount</p>                        
+                            @if (@Model.basket[i].PersonsCount > 1)
+                            {
+                            <form class="m-0" asp-action="MinusPerson" asp-route-id="@Model.basket[i].Id" style="margin-right: 10px;">
+                                    <input type="submit" value="-" class="btn-primary" />
+                            </form>   
+                            }
+                            else {
+                            <form class="m-0" asp-action="MinusPerson" asp-route-id="@Model.basket[i].Id" style="margin-right: 10px;">
+                                    <input type="submit" value="-" class="btn-primary" />
+                            </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4 d-flex flex-column justify-content-between">
+                    <form class="d-flex me-0 justify-content-end" asp-action="Delete" asp-route-id="@Model.basket[i].Id" style="margin-right: 10px;">
+                        <input type="submit" value="Отменить" />
+                    </form>
+                    @if (Model.tours[i].HotTour)
+                    {
+                        int pr = 0;
+                        <p class="price mb-0 text-decoration-line-through">@Model.tours[i].Price₽</p>
+                        pr = (int)(Model.tours[i].Price * 0.8);
+                        <p class="price mb-0">@pr</p>
+                    } else
+                    {
+                        <p class="price mb-0">@Model.tours[i].Price₽</p>
+                    }
+                </div>                              
+            </div>
+        </div>
+        
+        
+    }
+
+    @if(Model.price == Model.priceHotTour)
+    {
+        <h2>Итоговая цена - @Model.price</h2>
+        <div class="col-4 price-container d-flex justify-content-end flex-column">
+            <a asp-action="Create" asp-controller="Order" asp-route-price="@Model.price" class="buy-btn">Оформить</a>@**@
+        </div>
+    } else
+    {
+        <div class="flex-row">
+            <h3>Итоговая цена - </h3>
+            <h3 class="text-decoration-line-through">@Model.price</h3>
+            <h3> @Model.priceHotTour</h3>
+        </div>
+        <div class="col-4 price-container d-flex justify-content-end flex-column">
+            <a asp-action="Create" asp-controller="Order" asp-route-price="@Model.priceHotTour" class="buy-btn">Оформить</a>@**@
+        </div>
+    }
+    
+
+} else
+{
+    <div class="empty-cart mt-5">
+        <div class="empty-cart-border">
+            <h2>Корзина пуста</h2>
+        </div>        
+    </div>
+    
+}
+

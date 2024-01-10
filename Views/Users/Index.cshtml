@@ -1,0 +1,34 @@
+﻿@model agency.Models.ViewModel.UserChangeRole;
+
+
+<div>
+    <form>
+        <ul class="list-group w-100">
+                <p>
+                    Пользователь:
+                <input type="text" id="email" name="email" />
+                </p>
+        </ul>
+    </form>
+    <div id="view" name="view">
+        @await Html.PartialAsync("Search", Model)
+    </div>
+</div>
+
+
+
+@section Scripts{
+    <script>
+        $('#email').on("keyup", function () {
+            $.ajax({
+                type: "POST",
+                url: "/Users/Search",
+                data: $('form').serialize(),
+                dataType: 'html',
+                success: function (result) {
+                    $("#view").html(result);
+                }
+            });
+        });
+    </script>
+}

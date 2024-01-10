@@ -1,0 +1,36 @@
+﻿@model List<agency.Models.Order>
+
+@foreach (var item in Model)
+{
+    <div class="card justify-content-center align-items-center mb-3">
+        <div class="card-body">
+            <div class="text-body">Номер заказа @item.Id</div>
+            <div class="text-body">Статус заказа @item.OrderStatus</div>
+            @if (!String.IsNullOrEmpty(@item.PaymentStatus))
+            {
+                <div class="text-body">Статус оплаты @item.PaymentStatus</div>
+            }
+            <div class="text-body">Клиент @item.user?.UserName</div>
+            <div class="text-body">Дата покупки @item.BuyTime</div>
+            <div class="text-body">Цена заказа @item.Price</div>
+            <a asp-action="Info" asp-route-id="@item.Id">Подробнее</a>
+        </div>
+        @if (item.OrderStatus == "Ожидает подтверждения")
+        {
+            <form class="" asp-action="Submit" asp-route-id="@item.Id" style="margin-right: 10px;">
+                <input type="submit" value="Подтвердить" class="btn" />
+            </form>
+            <form class="" asp-action="Cencel" asp-route-id="@item.Id" style="margin-right: 10px;">
+                <input type="submit" value="Отменить" class="btn" />
+            </form>
+        }
+    </div>
+}
+@if (Model == null || Model.Count == 0)
+{
+    <div>
+        <p>
+            Ничего не нашлось(<br />
+        </p>
+    </div>
+}

@@ -1,0 +1,53 @@
+﻿@model IEnumerable<TourAgency.Models.Tour>
+
+
+@foreach (var item in Model)
+{
+    int pr = 0;
+    if (!item.Deleted)
+    {
+        <div>
+        <div class="card mb-3">
+            <div class="card-body justify-content-center align-items-center">
+                <div class="row h-100 w-100 mx-0">
+                    <div class="col-8 card-text-container d-flex flex-column align-items-between">
+                        <h5 style="font-style:bold; font-family:'Times New Roman', Times, serif">@Html.DisplayFor(modelItem => item.TourName)</h5>
+                        <p class="card-text">@Html.DisplayFor(modelItem => item.Description)</p>
+                    </div>
+                    <div class="col-4 price-container d-flex justify-content-end flex-column align-items-end">
+                        @if(item.HotTour)
+                        {
+                            <h3 class="mb-0">Горящий тур</h3>
+                            <p class="text-decoration-line-through">@Html.DisplayFor(modelItem => item.Price)₽</p>
+                            pr = (int)(item.Price * 0.8);
+                            <p>@pr</p>
+                        } else
+                        {
+                            <p>@Html.DisplayFor(modelItem => item.Price)₽</p>
+                        }
+                            @if (User.IsInRole("User"))
+                            {
+                                <a asp-action="Add" asp-controller="ShopCart" asp-route-id="@item.Id" class="btn btn-primary">Оформить</a>@**@
+                            }
+                        </div>
+                </div>
+            </div>
+        </div>
+        @if (User.IsInRole("TourOperator"))
+        {
+            <div class="mb-4">
+            <a asp-action="Edit" asp-route-id="@item.Id">Редактировать</a>
+            <a asp-action="Details" asp-route-id="@item.Id">Подробнее</a>
+            <a asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
+            </div>
+        }
+        </div>
+    }
+}
+@if(Model == null || Model.Count() == 0)
+{
+    <div class="card">
+        <h2 class="align-content-center">Ничего не найдено</h2>
+    </div>
+}
+

@@ -1,0 +1,45 @@
+﻿@model agency.Models.ViewModel.UserChangeRole;
+@{
+    int ind = 0;
+}
+@foreach (var i in Model.users)
+{
+    <div class="card">
+        <p class="m-2">user - @i.UserName</p>
+        @if (Model.userRoles.Any(p => p.UserId == i.Id))
+        {
+            <div class="m-2">
+                <form asp-action="SaveRole">
+                    <select name="ans" asp-for="@Model.userRoles[ind].RoleId">
+                        <option value="">-</option>
+                        <option value="1">Администратор</option>
+                        <option value="2">Туроператор</option>
+                    </select>
+                    <input type="hidden" asp-for="@i.Id" name="id">
+
+                    <input type="submit" value="Сохранить" />
+                </form>
+            </div>
+            ind++;
+        }
+        else
+        {
+            <div class="m-2">
+                <form asp-action="SaveRole">
+                    <select name="ans">
+                        <option value="">-</option>
+                        <option value="1">Администратор</option>
+                        <option value="2">Туроператор</option>
+                    </select>
+                    <input type="hidden" asp-for="@i.Id" name="id">
+
+                    <input type="submit" value="Сохранить" />
+                </form>
+            </div>
+        }
+    </div>
+}
+@if (Model.users.Count() == 0 || Model.users == null)
+{
+    <h2>Ничего не нашлось(</h2>
+}

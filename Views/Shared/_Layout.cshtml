@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - TourAgency</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/agency.styles.css" asp-append-version="true" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Nunito&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar-default navbar">
+            <div class="container-fluid">
+                <div class="col">
+                    <a class="h1 row h-100 justify-content-center align-items-center" asp-area="" asp-controller="Tours" asp-action="Index">TourAgency</a>
+                </div>
+                <div class="col d-flex justify-content-end">
+                    
+                    
+                    @if (User.IsInRole("TourOperator"))
+                    {
+                        <a style="padding:3px" class="admin" asp-area="" asp-controller="Profile" asp-action="Stat">
+                            <h3>Статистика </h3>
+                        </a>
+
+                        <a style="padding:3px" class="admin" asp-area="" asp-controller="Order" asp-action="Index">
+                            <h3>Заказы покупателей </h3>
+                        </a>
+                    }
+                    
+                    
+                    @if (User.IsInRole("User"))
+                    {
+                        <a style="padding:3px" class="admin" asp-area="" asp-controller="Profile" asp-action="MyOrders">
+                            <h3>Мои заказы </h3>
+                        </a>
+                    }
+                    
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                       
+                        <a style="padding:3px" class="login" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                            <h3>Выйти  </h3>
+                        </a> 
+                    }
+                    else {
+                        <a style="padding:3px" class="acc" asp-area="" asp-controller="Profile" asp-action="Profile">
+                            <h3>Войти  </h3>
+                        </a>
+                    }
+                    
+                </div>
+                    @*<partial name="_LoginPartial" />*@
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3 mx-auto w-50">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="navbar-default">
+            &copy; 2023 - TourAgency
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://kit.fontawesome.com/0e4a1ed86f.js" crossorigin="anonymous"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

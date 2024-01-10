@@ -1,0 +1,23 @@
+﻿@model Dictionary<string, int>;
+
+<h1>Стасистика количества человек по странам отдыха.</h1>
+<hr />
+
+<div class="row justify-content-center">
+    
+    <div class="col-md-5">
+        <table class="table">
+            <tr>
+                <td>Страна</td>
+                <td>Количество человек</td>
+            </tr>
+            @foreach (var i in Model)
+            {
+                <tr>
+                    <td>@i.Key</td>
+                    <td>@i.Value</td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
