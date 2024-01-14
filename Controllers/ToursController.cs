@@ -30,25 +30,9 @@ namespace agency.Controllers
                           Problem("Entity set 'ApplicationDbContext.Tour'  is null.");
         }
         [HttpPost]
-        public IActionResult Search(bool hotTour, string searchString)
-        {
-            List<Tour> Tours =  _context.Tour.Where(x => !x.Deleted).ToList();
-            List<Tour> filteredTours = null;
+        
 
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                filteredTours = Tours.Where(s => s.TourName.ToLower()!.Contains(searchString.ToLower())).ToList();
-                Tours = filteredTours;
-            }
-            if (hotTour != false && hotTour != null)
-            {
-                filteredTours = Tours.Where(s => s.HotTour == true).ToList();
-                Tours = filteredTours;
-            }
-            return PartialView(Tours);
-        }
-
-        [Authorize(Roles = "Admin,TourOperator")]
+        [Authorize(Roles = "TourOperator")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Tour == null)
@@ -66,7 +50,7 @@ namespace agency.Controllers
             return View(tour);
         }
 
-        [Authorize(Roles = "Admin,TourOperator")]
+        [Authorize(Roles = "TourOperator")]
         public IActionResult Create()
         {
             return View();
@@ -74,7 +58,7 @@ namespace agency.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin,TourOperator")]
+        [Authorize(Roles = "TourOperator")]
         public async Task<IActionResult> Create(Tour tour)
         {
             if (ModelState.IsValid)
@@ -87,7 +71,7 @@ namespace agency.Controllers
             return View(tour);
         }
 
-        [Authorize(Roles = "Admin,TourOperator")]
+        [Authorize(Roles = "TourOperator")]
         public async Task<IActionResult> Edit(int? id)
         {
             // will give the user's userId
@@ -108,7 +92,7 @@ namespace agency.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin,TourOperator")]
+        [Authorize(Roles = "TourOperator")]
         public async Task<IActionResult> Edit(int id,Tour tour)
         {
             if (id != tour.Id)
@@ -139,7 +123,7 @@ namespace agency.Controllers
             return View(tour);
         }
 
-        [Authorize(Roles = "Admin,TourOperator")]
+        [Authorize(Roles = "TourOperator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Tour == null)
@@ -159,7 +143,7 @@ namespace agency.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin,TourOperator")]
+        [Authorize(Roles = "TourOperator")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (_context.Tour == null)

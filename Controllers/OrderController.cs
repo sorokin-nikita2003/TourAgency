@@ -19,7 +19,7 @@ namespace agency.Controllers
         {
             _context = context;
         }
-        [Authorize(Roles = "Admin,TourOperator")]
+        [Authorize(Roles = "TourOperator")]
         public async Task<IActionResult> Index()
         {
             List<Order> orders = await _context.Orders.ToListAsync();
@@ -32,39 +32,8 @@ namespace agency.Controllers
                           Problem("Entity set 'ApplicationDbContext.Tour'  is null.");
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Search(string? searchString, int? id, bool sub)
-        {
-            List<Order> orders = await _context.Orders.ToListAsync();
-            foreach (Order order in orders)
-            {
-                order.user = await _context.Users.FindAsync(order.UserId);
-            }
-            List<Order> filteredOrders = null;
 
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                filteredOrders = orders.Where(s => s.user.UserName!.Contains(searchString)).ToList();
-                orders = filteredOrders;
-            }
-            if (id != null)
-            {
-                filteredOrders = orders.Where(s => s.Id == id).ToList();
-                orders = filteredOrders;
-            }
-            if (sub)
-            {
-                filteredOrders = orders.Where(s => s.OrderStatus == "Ожидает подтверждения").ToList();
-                orders = filteredOrders;
-            }
-
-
-
-            return PartialView(orders);
-        }
-
-
-        [Authorize(Roles = "Admin,TourOperator")]
+        [Authorize(Roles = "TourOperator")]
         public async Task<IActionResult> Submit(int id)
         {
 
@@ -80,7 +49,7 @@ namespace agency.Controllers
             return RedirectToAction(nameof(Index));
 
         }
-        [Authorize(Roles = "Admin,TourOperator")]
+        [Authorize(Roles = "TourOperator")]
         public async Task<IActionResult> Cencel(int id)
         {
 

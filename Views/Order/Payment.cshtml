@@ -3,7 +3,7 @@
 <form asp-action="PaymentCard" method="post">
     <div class="form-group">
         <label class="control-label">Введите номер карты:</label>
-        <input name="cartNum" type="number" maxlength="16" class="form-control w-25" />
+        <input name="cartNum" type="number" maxlength="19" class="form-control w-25" id="numberInput" oninput="formatInputNumber(this)" />
         <p style="color: red;">@ViewBag.card</p>
     </div>
     <div class="form-group">
@@ -20,3 +20,22 @@
         <input type="submit" value="Оплатить" class="btn btn-primary" />
     </div>
 </form>
+
+<script>
+    function formatInputNumber(input) {
+        // Удаляем все пробелы из значения ввода
+        let value = input.value.replace(/\s/g, '');
+
+        // Разбиваем значение на четыре цифры
+        let parts = value.match(/.{1,4}/g);
+
+        // Добавляем пробел после каждых четырех цифр
+        if (parts) {
+            value = parts.join(' ');
+        }
+
+        // Устанавливаем отформатированное значение обратно в инпут
+        input.value = value;
+    }
+
+</script>
