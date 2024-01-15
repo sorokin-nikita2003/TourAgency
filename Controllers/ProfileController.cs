@@ -58,7 +58,6 @@ namespace agency.Controllers
             {
                 country.Tour = await _context.Tour.FindAsync(country.TourId);
             }
-            var t = await _context.Tour.ToListAsync();
 
             foreach(var i in ot)
             {

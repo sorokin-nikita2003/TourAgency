@@ -6,12 +6,12 @@
     @for(int i = 0; i < Model.tours.Count(); i++)
     {
         <div class="card">
-            <div class="card-body row h-100 w-100 mx-0">
-                <div class="col-8 d-flex flex-column justify-content-between">
+            <div class="card-body h-100 w-100 mx-0">
+                <div class="col-8 d-flex flex-column justify-content-between text-align:center">
                     <h5 style="font-style:bold; font-family:'Times New Roman', Times, serif">@Model.tours[i].TourName</h5>
-                    <div>
+                    <div class="text-center">
                         <p>Количество человек</p>
-                        <div class="personsCount d-flex flex-row-reverse w-100 justify-content-end">
+                        <div class="d-flex align-content-center justify-content-center flex-row-reverse">
                             <form class="m-0" asp-action="PlusPerson" asp-route-id="@Model.basket[i].Id" style="margin-right: 10px;">
                                 <input type="submit" value="+" class="btn-primary" />
                             </form>
@@ -31,9 +31,7 @@
                     </div>
                 </div>
                 <div class="col-4 d-flex flex-column justify-content-between">
-                    <form class="d-flex me-0 justify-content-end" asp-action="Delete" asp-route-id="@Model.basket[i].Id" style="margin-right: 10px;">
-                        <input type="submit" value="Отменить" />
-                    </form>
+                   
                     @if (Model.tours[i].HotTour)
                     {
                         int pr = 0;
@@ -44,6 +42,9 @@
                     {
                         <p class="price mb-0">@Model.tours[i].Price₽</p>
                     }
+                    <form class="d-flex me-0 justify-content-end" asp-action="Delete" asp-route-id="@Model.basket[i].Id" style="margin-right: 10px;">
+                        <input type="submit" value="Отменить" />
+                    </form>
                 </div>                              
             </div>
         </div>
