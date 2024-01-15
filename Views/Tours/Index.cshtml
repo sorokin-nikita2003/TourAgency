@@ -12,9 +12,57 @@
         <a class="h3" asp-action="Create">Добавить тур</a>
     }
 </p>
+
+<div class="row justify-content-center">
+        <form>
+            <div>
+                <div>
+                    <input type="checkbox" value="true" name="hotTour" id="hotTour" method="get" />
+                    <label class="" for="HotTours">Горящий тур</label>
+                </div>
+                <div>
+                    <p>
+                        Тур:
+                    <input type="text" id="SearchString" name="SearchString" method="get" style="width:300px" />
+                    </p>
+                </div>
+            </div>
+        </form>
+</div>
+
 <div class="row justify-content-center">
     <div style="padding:7px; width:500px" name="view" id="view">
         @await Html.PartialAsync("Search", Model)
     </div>
-    
 </div>
+
+@section Scripts{
+    <script>
+
+        $('#SearchString').on("keyup", function () {
+            $.ajax({
+                type: "POST",
+                url: "/Tours/Search",
+                data: $('form').serialize(),
+                dataType: 'html',
+                success: function (result) {
+                    $("#view").html(result);
+                }
+            });
+        });
+
+        $('#hotTour').click(function () {
+            $.ajax({
+                type: "POST",
+                url: "/Tours/Search",
+                data: $('form').serialize(),
+                dataType: 'html',
+                success: function (result) {
+                    $("#view").html(result);
+                }
+            });
+        });
+
+
+    </script>
+}

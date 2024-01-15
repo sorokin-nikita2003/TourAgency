@@ -30,7 +30,23 @@ namespace agency.Controllers
                           Problem("Entity set 'ApplicationDbContext.Tour'  is null.");
         }
         [HttpPost]
-        
+        public IActionResult Search(bool hotTour, string searchString)
+        {
+            List<Tour> Tours = _context.Tour.Where(x => !x.Deleted).ToList();
+            List<Tour> filteredTours = null;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                filteredTours = Tours.Where(s => s.TourName.ToLower()!.Contains(searchString.ToLower())).ToList();
+                Tours = filteredTours;
+            }
+            if (hotTour != false && hotTour != null)
+            {
+                filteredTours = Tours.Where(s => s.HotTour == true).ToList();
+                Tours = filteredTours;
+            }
+            return PartialView(Tours);
+        }
 
         [Authorize(Roles = "TourOperator")]
         public async Task<IActionResult> Details(int? id)
