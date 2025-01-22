@@ -6,7 +6,12 @@
     int pr = 0;
     if (!item.Deleted)
     {
-        <div>
+        <div class="tour-card"
+        data-id="@item.Id"
+        data-name="@item.TourName" 
+        data-description="@item.Description" 
+        data-price="@item.Price" 
+        data-hottour="@item.HotTour">
         <div class="card mb-3">
             <div class="card-body justify-content-center align-items-center">
                 <div class="row h-100 w-100 mx-0">
@@ -36,7 +41,7 @@
         @if (User.IsInRole("TourOperator"))
         {
             <div class="mb-4">
-            <a asp-action="Edit" asp-route-id="@item.Id">Редактировать</a>
+            <a asp-action="Edit" asp-route-id="@item.Id">Реsдактировать</a>
             <a asp-action="Details" asp-route-id="@item.Id">Подробнее</a>
             <a asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
             </div>
@@ -51,3 +56,33 @@
     </div>
 }
 
+    <script>
+        console.log("ewgwrgreg");
+        document.addEventListener("DOMContentLoaded", function () {
+            // Извлечение всех элементов с классом "tour-card"
+            const tourCards = document.querySelectorAll('.tour-card');
+
+            // Создание массива для данных
+            const tours = Array.from(tourCards).map(card => ({
+                id: card.dataset.id,
+                name: card.dataset.name,
+                description: card.dataset.description,
+                price: parseFloat(card.dataset.price),
+                hotTour: card.dataset.hottour === 'True'
+            }));
+
+            console.log("Сформированный JSON:", tours);
+
+            // Пример: Отправка данных на сервер через fetch
+            fetch("https://localhost:7215/Tours/GetAll", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(tours)
+            })
+            .then(response => response.json())
+            .then(data => console.log('Ответ сервера:', data))
+            .catch(error => console.error('Ошибка:', error));
+        });
+    </script>

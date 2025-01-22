@@ -33,3 +33,56 @@
 
 <h2>Итоговая цена - @Model.Price</h2>
 <a asp-action="">Назад</a>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Создаем объект для хранения данных
+        let orderData = {
+            orderedTours: [],
+            totalPrice: parseInt(document.querySelector("h2").innerText.replace("Итоговая цена - ", "")),
+        };
+
+        // Находим все карточки туров
+        let cards = document.querySelectorAll(".card");
+        cards.forEach(card => {
+            let tourName = card.querySelector("h4").innerText; // Название тура
+            let personsCount = parseInt(card.querySelector("p:nth-of-type(1)").innerText.replace("Количесво человек ", "")); // Количество человек
+            let pricePerPerson = parseInt(card.querySelector("p:nth-of-type(2)").innerText.replace("Цена за 1: ", "").replace("₽", "")); // Цена за одного
+            let totalPrice = parseInt(card.querySelector("h4:nth-of-type(2)").innerText.replace("Итого: ", "")); // Итоговая цена за тур
+
+            // Добавляем тур в список
+            orderData.orderedTours.push({
+                tourName: tourName,
+                personsCount: personsCount,
+                pricePerPerson: pricePerPerson,
+                totalPrice: totalPrice
+            });
+        });
+
+        // Проверяем результат
+        console.log(orderData);
+
+        // Отправляем данные через JSON-запрос
+        fetch("https://localhost:7215/Order/Info", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer your-token-here' // Укажите токен, если требуется
+            },
+            body: JSON.stringify(orderData)
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error("Ошибка при отправке данных");
+            }
+        })
+        .then(data => {
+            console.log("Данные успешно отправлены:", data);
+        })
+        .catch(error => {
+            console.error("Ошибка:", error);
+        });
+    });
+</script>

@@ -10,7 +10,8 @@ using TourAgency.Models.ViewModel;
 
 namespace agency.Controllers
 {
-    [Authorize]
+    [Route("api/[controller]")]
+    //[Authorize]
     public class ShopCartController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -51,31 +52,44 @@ namespace agency.Controllers
 
             return View(sc);
         }
-        public async Task<IActionResult> Add(int id)
+
+        [HttpPost("Add")]
+        public async Task<IActionResult> Add([FromBody] AddBasketRequest request)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            // Проверка валидности данных
+            if (request == null || request.Id <= 0 || string.IsNullOrEmpty(request.UserId) || request.PersonsCount <= 0)
+            {
+                return BadRequest(new { Message = "Некорректные данные в запросе" });
+            }
 
-
-            Basket basketTour = await _context.baskets
-                .FirstOrDefaultAsync(m => m.TourId == id && m.UserId == userId);
+            // Проверка наличия записи в корзине
+            var basketTour = await _context.baskets
+                .FirstOrDefaultAsync(m => m.TourId == request.Id && m.UserId == request.UserId);
 
             if (basketTour == null)
             {
-                basketTour = new Basket();
-                basketTour.TourId = id;
-                basketTour.UserId = userId;
-                basketTour.PersonsCount = 1;
+                // Создание новой записи в корзине
+                basketTour = new Basket
+                {
+                    TourId = request.Id,
+                    UserId = request.UserId,
+                    PersonsCount = request.PersonsCount
+                };
                 _context.Add(basketTour);
-                _context.SaveChanges();
             }
             else
             {
-                basketTour.PersonsCount++;
+                // Обновление существующей записи в корзине
+                basketTour.PersonsCount += request.PersonsCount;
                 _context.Update(basketTour);
-                await _context.SaveChangesAsync();
             }
-            return RedirectToAction(nameof(Index));
+
+            await _context.SaveChangesAsync();
+
+            // Возврат успешного ответа
+            return Ok(new { Message = "Тур успешно добавлен в корзину" });
         }
+
         public async Task<IActionResult> Delete(int id)
         {
 
@@ -122,4 +136,11 @@ namespace agency.Controllers
 
 
     }
+    public class AddBasketRequest
+    {
+        public int Id { get; set; } // ID тура
+        public string UserId { get; set; } // ID пользователя
+        public int PersonsCount { get; set; } // Количество человек
+    }
+
 }

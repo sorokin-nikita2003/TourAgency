@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace agency.Controllers
 {
+    [Route("api/[controller]")]
     public class ToursController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -29,10 +30,12 @@ namespace agency.Controllers
                           View(await _context.Tour.ToListAsync()) :
                           Problem("Entity set 'ApplicationDbContext.Tour'  is null.");
         }
-        [HttpPost]
+        [HttpGet("GetAll")]
         public IActionResult Search(bool hotTour, string searchString)
         {
             List<Tour> Tours = _context.Tour.Where(x => !x.Deleted).ToList();
+            return Ok(Tours);
+
             List<Tour> filteredTours = null;
 
             if (!String.IsNullOrEmpty(searchString))
@@ -45,10 +48,9 @@ namespace agency.Controllers
                 filteredTours = Tours.Where(s => s.HotTour == true).ToList();
                 Tours = filteredTours;
             }
-            return PartialView(Tours);
         }
 
-        [Authorize(Roles = "TourOperator")]
+        [HttpGet("Details/{id}")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Tour == null)
@@ -63,7 +65,7 @@ namespace agency.Controllers
                 return NotFound();
             }
 
-            return View(tour);
+            return Ok(tour);
         }
 
         [Authorize(Roles = "TourOperator")]
@@ -72,22 +74,24 @@ namespace agency.Controllers
             return View();
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "TourOperator")]
-        public async Task<IActionResult> Create(Tour tour)
+        [HttpPost("Create")]
+        // [ValidateAntiForgeryToken]
+        // [Authorize(Roles = "TourOperator")]
+        public async Task<IActionResult> CreateTour([FromBody] Tour tour)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Add(tour);
-                tour.Deleted = false;
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return BadRequest(ModelState);
             }
-            return View(tour);
+
+            // Добавляем тур в базу данных
+            _context.Tour.Add(tour);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(Details), new { id = tour.Id }, tour); // Возвращаем созданный объект
         }
 
-        [Authorize(Roles = "TourOperator")]
+        // [Authorize(Roles = "TourOperator")]
         public async Task<IActionResult> Edit(int? id)
         {
             // will give the user's userId
@@ -106,38 +110,40 @@ namespace agency.Controllers
             return View(tour);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "TourOperator")]
-        public async Task<IActionResult> Edit(int id,Tour tour)
+        [HttpPost("Edit")]
+        public async Task<IActionResult> Edit([FromBody] Tour tour)
         {
-            if (id != tour.Id)
+            if (!ModelState.IsValid)
             {
-                return NotFound();
+                var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                            .Select(e => e.ErrorMessage);
+                return BadRequest(new { Message = "Invalid model", Errors = errors });
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
+                if (!TourExists(tour.Id))
                 {
-                    _context.Update(tour);
-                    await _context.SaveChangesAsync();
+                    return NotFound(new { Message = "Tour not found" });
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TourExists(tour.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+
+                _context.Attach(tour).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
+                return Ok(new { Message = "Tour updated successfully" });
             }
-            return View(tour);
+            catch (DbUpdateConcurrencyException ex)
+            {
+                Console.WriteLine($"Concurrency error: {ex.Message}");
+                return StatusCode(500, new { Message = "Database concurrency error" });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return StatusCode(500, new { Message = "An unexpected error occurred" });
+            }
         }
+
 
         [Authorize(Roles = "TourOperator")]
         public async Task<IActionResult> Delete(int? id)
@@ -154,12 +160,12 @@ namespace agency.Controllers
                 return NotFound();
             }
 
-            return View(tour);
+            return Ok(tour);
         }
 
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "TourOperator")]
+        [HttpPost("Delete/{id}")]
+        // [ValidateAntiForgeryToken]
+        // [Authorize(Roles = "TourOperator")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (_context.Tour == null)
@@ -174,12 +180,23 @@ namespace agency.Controllers
             }
             
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            //return RedirectToAction(nameof(Index));
+            return Ok(id);
         }
 
         private bool TourExists(int id)
         {
           return (_context.Tour?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+    }
+
+    public class TourDto
+    {
+        public string TourName { get; set; }
+        public string Country { get; set; }
+        public decimal Price { get; set; }
+        public string DateStart { get; set; }
+        public string Description { get; set; }
+        public bool HotTour { get; set; }
     }
 }

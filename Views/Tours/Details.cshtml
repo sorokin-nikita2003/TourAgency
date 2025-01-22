@@ -8,7 +8,7 @@
 
 <div>
     <h4>
-    <dd class="col-sm-10">
+    <dd class="col-sm-10" for="TourName">
             @Html.DisplayFor(model => model.TourName)
     </dd></h4>
     <hr />
@@ -17,32 +17,32 @@
         <dt class = "col-sm-2">
            Страна
         </dt>
-        <dd class = "col-sm-10">
+        <dd class = "col-sm-10" for="Country">
             @Html.DisplayFor(model => model.Country)
         </dd>
         <dt class = "col-sm-2">
             Стоимость
         </dt>
-        <dd class = "col-sm-10">
+        <dd class = "col-sm-10" for="Price">
             @Html.DisplayFor(model => model.Price)
         </dd>
         <dt class = "col-sm-2">
            Начало тура
         </dt>
-        <dd class = "col-sm-10">
+        <dd class = "col-sm-10" for="DateStart">
             @Html.DisplayFor(model => model.DateStart)
         </dd>
         <dt class = "col-sm-2">
             Описание тура
         </dt>
-        <dd class = "col-sm-10">
+        <dd class = "col-sm-10" for="Description">
             @Html.DisplayFor(model => model.Description)
         </dd>
        
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.HotTour)
         </dt>
-        <dd class="col-sm-10">
+        <dd class="col-sm-10" for="HotTour">
             @if (Model.HotTour == true)
             {
                 <p>Да</p>
@@ -59,3 +59,46 @@
     <a style="margin-right:10px" asp-action="Edit" asp-route-id="@Model?.Id">Редактировать</a>
     <a asp-action="Index">Назад</a>
 </div>
+
+
+
+<script>
+    // Собираем данные из элементов на странице
+    const tourDetails = {
+        tourName: document.querySelector("dd[for='TourName']").innerText.trim(),
+        country: document.querySelector("dd[for='Country']").innerText.trim(),
+        price: parseFloat(document.querySelector("dd[for='Price']").innerText.trim()),
+        dateStart: document.querySelector("dd[for='DateStart']").innerText.trim(),
+        description: document.querySelector("dd[for='Description']").innerText.trim(),
+        hotTour: document.querySelector("dd[for='HotTour']").innerText.trim() === "Да"
+    };
+
+    console.log("Сформированный JSON объект:", JSON.stringify(tourDetails));
+
+    // Пример: отправка JSON на сервер (опционально)
+    fetch("https://localhost:7215/Tours/Details", {
+        method: "POST", // Замените на нужный метод, если требуется
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(tourDetails)
+    })
+    .then(response => response.json())
+    .then(data => console.log("Ответ сервера:", data))
+    .catch(error => console.error("Ошибка:", error));
+</script>
+<button id="sendToMobile">Отправить на мобильное приложение</button>
+<script>
+    document.getElementById("sendToMobile").addEventListener("click", function () {
+        fetch("https://localhost:7215/api/Tours/sendTourDetails", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(tourDetails)
+        })
+        .then(response => response.json())
+        .then(data => console.log("Данные отправлены на мобильное приложение:", data))
+        .catch(error => console.error("Ошибка при отправке:", error));
+    });
+</script>

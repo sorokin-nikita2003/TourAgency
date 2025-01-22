@@ -51,6 +51,44 @@
     <a asp-action="Index">Отменить</a>
 </div>
 
-@section Scripts {
+    <script>
+        document.querySelector('form').addEventListener('submit', async (event) => {
+            event.preventDefault(); // Остановить стандартное поведение отправки формы
+
+            // Получение данных из формы
+            const formData = new FormData(event.target);
+            const data = {
+                TourName: formData.get('TourName'),
+                Price: parseFloat(formData.get('Price')),
+                Country: formData.get('Country'),
+                Description: formData.get('Description'),
+                DateStart: formData.get('DateStart'),
+                HotTour: formData.get('HotTour') === "on" // Преобразование чекбокса
+            };
+
+            console.log("Сформированный JSON:", data);
+
+            try {
+                const response = await fetch('https://localhost:7215/Tours/Create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    // Если запрос успешен, перенаправить на список туров
+                    alert('Тур успешно создан!');
+                    window.location.href = '@Url.Action("Index", "Tours")';
+                } else {
+                    const error = await response.json();
+                    alert(`Ошибка: ${error.message || 'Не удалось создать тур.'}`);
+                }
+            } catch (error) {
+                console.error('Ошибка при отправке запроса:', error);
+                alert('Произошла ошибка при отправке данных.');
+            }
+        });
+    </script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}

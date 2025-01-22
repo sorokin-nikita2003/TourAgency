@@ -9,17 +9,19 @@ using static NuGet.Packaging.PackagingConstants;
 
 namespace agency.Controllers
 {
-    [Authorize]
+    [Route("api/[controller]")]
+    // [Authorize]
     public class OrderController : Controller
     {
 
-        
         private readonly ApplicationDbContext _context;
         public OrderController(ApplicationDbContext context)
         {
             _context = context;
         }
-        [Authorize(Roles = "TourOperator")]
+
+        [HttpGet("GetAll")]
+        // [Authorize(Roles = "TourOperator")]
         public async Task<IActionResult> Index()
         {
             List<Order> orders = await _context.Orders.ToListAsync();
@@ -28,33 +30,43 @@ namespace agency.Controllers
                 order.user = await _context.Users.FindAsync(order.UserId);
             }
             return _context.Orders != null ?
-                          View(orders) :
+                          Ok(orders) :
                           Problem("Entity set 'ApplicationDbContext.Tour'  is null.");
         }
 
-        
 
-        [Authorize(Roles = "TourOperator")]
-        public async Task<IActionResult> Submit(int id)
+        [HttpPost("Submit")]
+        // [Authorize(Roles = "TourOperator")]
+        public async Task<IActionResult> Submit([FromBody] SubmitOrderRequest request)
         {
-
-            var Order = await _context.Orders.FindAsync(id);
-            if (Order != null)
+            // Проверка данных
+            if (request == null || request.Id <= 0)
             {
-                Order.OrderStatus = "Подтвержден";
-                Order.PaymentStatus = "Ожидает оплаты";
-                _context.Orders.Update(Order);
+                return BadRequest(new { Message = "Некорректный запрос, отсутствует или неверный ID" });
             }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            // Поиск заказа
+            var order = await _context.Orders.FindAsync(request.Id);
+            if (order == null)
+            {
+                return NotFound(new { Message = "Заказ с указанным ID не найден" });
+            }
 
+            // Обновление статуса заказа
+            order.OrderStatus = "Подтвержден";
+            order.PaymentStatus = "Ожидает оплаты";
+            _context.Orders.Update(order);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Message = "Заказ успешно подтвержден", OrderId = order.Id });
         }
-        [Authorize(Roles = "TourOperator")]
-        public async Task<IActionResult> Cencel(int id)
+
+        [HttpPost("Cancel")]
+        // [Authorize(Roles = "TourOperator")]
+        public async Task<IActionResult> Cencel([FromBody] SubmitOrderRequest request)
         {
 
-            var Order = await _context.Orders.FindAsync(id);
+            var Order = await _context.Orders.FindAsync(request.Id);
             if (Order != null)
             {
                 Order.OrderStatus = "Отменён";
@@ -64,37 +76,66 @@ namespace agency.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-        public async Task<IActionResult> Create(int price) 
+        [HttpPost("Create")]
+        public async Task<IActionResult> Create([FromBody] CreateOrderRequest request)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            // Проверка входных данных
+            if (request == null || string.IsNullOrEmpty(request.UserId) || request.Price <= 0)
+            {
+                return BadRequest(new { Message = "Некорректные данные в запросе" });
+            }
 
-            Order order = new Order();
-            order.UserId = userId;
-            order.BuyTime = DateTime.Now;
-            order.OrderStatus = "Ожидает подтверждения";
-            order.Price = price;
+            // Создание нового заказа
+            var order = new Order
+            {
+                UserId = request.UserId,
+                BuyTime = request.BuyTime,
+                OrderStatus = "Ожидает подтверждения",
+                Price = request.Price
+            };
 
             _context.Add(order);
-            _context.SaveChanges();
-            order = _context.Orders.OrderBy(e => e.BuyTime).LastOrDefault(w => w.UserId == userId);
+            await _context.SaveChangesAsync();
 
-            List<Basket> shopCartItems = _context.baskets.Where(m => m.UserId == userId).ToList();
-            OrderedTour orderedTour;
+            // Получение созданного заказа
+            order = _context.Orders
+                .OrderBy(e => e.BuyTime)
+                .LastOrDefault(w => w.UserId == request.UserId);
 
+            if (order == null)
+            {
+                return StatusCode(500, new { Message = "Ошибка при создании заказа" });
+            }
 
+            // Получение элементов корзины пользователя
+            var shopCartItems = _context.baskets
+                .Where(m => m.UserId == request.UserId)
+                .ToList();
+
+            if (shopCartItems == null || !shopCartItems.Any())
+            {
+                return BadRequest(new { Message = "Корзина пользователя пуста" });
+            }
+
+            // Перенос данных из корзины в OrderedTour
             foreach (var item in shopCartItems)
             {
-                orderedTour = new OrderedTour();
-                orderedTour.OrderId = order.Id;
-                orderedTour.TourId = item.TourId;
-                orderedTour.PersonsCount = item.PersonsCount;
+                var orderedTour = new OrderedTour
+                {
+                    OrderId = order.Id,
+                    TourId = item.TourId,
+                    PersonsCount = item.PersonsCount
+                };
+
                 _context.Add(orderedTour);
                 _context.Remove(item);
             }
-            _context.SaveChanges();
 
-            return RedirectToAction("Index", "Tours");
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Message = "Заказ успешно создан", OrderId = order.Id });
         }
+
         public async Task<IActionResult> Payment(int id, string? nomcvv, string card)
         {
             ViewBag.cvv = nomcvv; 
@@ -102,63 +143,67 @@ namespace agency.Controllers
             ViewBag.Id = id;
             return View();
         }
-        [HttpPost]
-        public async Task<IActionResult> PaymentCard(int id, string cvv, string cartNum)
+        [HttpPost("PaymentCard")]
+        public async Task<IActionResult> PaymentCard([FromBody] PaymentRequest request)
         {
             string ansCVV = null;
             string ansCard = null;
             bool flagcvv = false;
             bool flagcart = false;
+
             try
             {
-                if(int.Parse(cvv) < 100 || int.Parse(cvv) > 999 || cvv.Length != 3)
+                if (int.Parse(request.CVV) < 100 || int.Parse(request.CVV) > 999 || request.CVV.Length != 3)
                 {
                     flagcvv = true;
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception)
             {
                 flagcvv = true;
             }
+
             try
             {
-                if (long.Parse(cartNum) < 1000_0000_0000_0000 || long.Parse(cartNum) > 9999_9999_9999_9999 || cartNum.Length != 16)
+                if (long.Parse(request.CardNum) < 1000_0000_0000_0000 || long.Parse(request.CardNum) > 9999_9999_9999_9999 || request.CardNum.Length != 16)
                 {
                     flagcart = true;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 flagcart = true;
             }
 
-            if (flagcvv || flagcart) 
+            if (flagcvv || flagcart)
             {
-                if(flagcvv)
+                if (flagcvv)
                 {
-                    ansCVV = "Некорректно введенный cvv код";
+                    ansCVV = "Некорректно введенный CVV код";
                 }
                 if (flagcart)
                 {
                     ansCard = "Некорректно введенный номер карты";
                 }
-                return RedirectToAction("Payment", new { id = id, nomcvv = ansCVV, card = ansCard });
+                return BadRequest(new { Message = "Ошибка валидации", CVVError = ansCVV, CardError = ansCard });
             }
 
-
-
-            var Order = await _context.Orders.FindAsync(id);
-            if (Order != null)
+            var order = await _context.Orders.FindAsync(request.Id);
+            if (order != null)
             {
-                Order.PaymentStatus = "Оплачен";
-                _context.Orders.Update(Order);
+                order.PaymentStatus = "Оплачен";
+                _context.Orders.Update(order);
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction("MyOrders", "Profile");
+            return Ok(new { Message = "Оплата успешно выполнена" });
         }
+
         public async Task<IActionResult> Info(int id)
         {
             var order = await _context.Orders.FirstAsync(x => x.Id == id);
+
+            return Ok(order);
 
             List<OrderedTour> orderedTours = _context.OrderedTour.Where(p => p.OrderId == id).ToList();
 
@@ -168,9 +213,27 @@ namespace agency.Controllers
             }
             order.OrderedTours = orderedTours;
 
-            return View(order);
         }
 
         
     }
+    public class PaymentRequest
+    {
+        public int Id { get; set; }
+        public string CVV { get; set; }
+        public string CardNum { get; set; }
+    }
+    public class CreateOrderRequest
+    {
+        public string UserId { get; set; } // ID пользователя
+        public DateTime BuyTime { get; set; } // Время покупки
+        public int Price { get; set; } // Цена заказа
+
+    }
+    public class SubmitOrderRequest
+    {
+        public int Id { get; set; } // ID заказа
+    }
+
+
 }
